@@ -23,17 +23,17 @@
 
 ******************************************************************/
 
-if ( typeof(JKL) == 'undefined' ) JKL = function() {};
+// if ( typeof(JKL) == 'undefined' ) JKL = function() {};
 
 //  JKL.Dumper Constructor
 
-JKL.Dumper = function () {
+Dumper = function () {
     return this;
 };
 
 //  Dump the data into JSON format
 
-JKL.Dumper.prototype.dump = function ( data, offset ) {
+Dumper.prototype.dump = function ( data, offset ) {
     if ( typeof(offset) == "undefined" ) offset = "";
     var nextoff = offset + "  ";
     switch ( typeof(data) ) {
@@ -82,11 +82,11 @@ JKL.Dumper.prototype.dump = function ( data, offset ) {
 
 //  escape '\' and '"'
 
-JKL.Dumper.prototype.escapeString = function ( str ) {
+Dumper.prototype.escapeString = function ( str ) {
     return str.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\\"" );
 };
 
 //  ===============================================================
 
 
-module.exports = new JKL.Dumper();
+module.exports = new Dumper();

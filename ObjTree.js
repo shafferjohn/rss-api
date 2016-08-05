@@ -5,27 +5,28 @@
 // The next line is added by Shaffer John (the rss-api module author) to satisfy compatibility.
 var DOMParser = require('xmldom').DOMParser;
 
-if ( typeof(XML) == 'undefined' ) XML = function() {};
+// if ( typeof(XML) == 'undefined' ) XML = function() {};
 
 //  constructor
 
-XML.ObjTree = function () {
+ObjTree = function () {
     return this;
 };
 
 //  class variables
 
-XML.ObjTree.VERSION = "0.24";
+ObjTree.VERSION = "0.24";
 
 //  object prototype
 
-XML.ObjTree.prototype.xmlDecl = '<?xml version="1.0" encoding="UTF-8" ?>\n';
-XML.ObjTree.prototype.attr_prefix = '-';
-XML.ObjTree.prototype.overrideMimeType = 'text/xml';
+ObjTree.prototype.xmlDecl = '<?xml version="1.0" encoding="UTF-8" ?>\n';
+ObjTree.prototype.rssDecl = '<rss version="2.0">\n';
+ObjTree.prototype.attr_prefix = '-';
+ObjTree.prototype.overrideMimeType = 'text/xml';
 
 //  method: parseXML( xmlsource )
 
-XML.ObjTree.prototype.parseXML = function ( xml ) {
+ObjTree.prototype.parseXML = function ( xml ) {
     var root;
 
     var xmldom = new DOMParser();
@@ -56,63 +57,9 @@ I made some modifications above, just intending to satisfy compatibility.
     return this.parseDOM( root );
 };
 
-//  method: parseHTTP( url, options, callback )
-
-XML.ObjTree.prototype.parseHTTP = function ( url, options, callback ) {
-    var myopt = {};
-    for( var key in options ) {
-        myopt[key] = options[key];                  // copy object
-    }
-    if ( ! myopt.method ) {
-        if ( typeof(myopt.postBody) == "undefined" &&
-             typeof(myopt.postbody) == "undefined" &&
-             typeof(myopt.parameters) == "undefined" ) {
-            myopt.method = "get";
-        } else {
-            myopt.method = "post";
-        }
-    }
-    if ( callback ) {
-        myopt.asynchronous = true;                  // async-mode
-        var __this = this;
-        var __func = callback;
-        var __save = myopt.onComplete;
-        myopt.onComplete = function ( trans ) {
-            var tree;
-            if ( trans && trans.responseXML && trans.responseXML.documentElement ) {
-                tree = __this.parseDOM( trans.responseXML.documentElement );
-            } else if ( trans && trans.responseText ) {
-                tree = __this.parseXML( trans.responseText );
-            }
-            __func( tree, trans );
-            if ( __save ) __save( trans );
-        };
-    } else {
-        myopt.asynchronous = false;                 // sync-mode
-    }
-    var trans;
-    if ( typeof(HTTP) != "undefined" && HTTP.Request ) {
-        myopt.uri = url;
-        var req = new HTTP.Request( myopt );        // JSAN
-        if ( req ) trans = req.transport;
-    } else if ( typeof(Ajax) != "undefined" && Ajax.Request ) {
-        var req = new Ajax.Request( url, myopt );   // ptorotype.js
-        if ( req ) trans = req.transport;
-    }
-//  if ( trans && typeof(trans.overrideMimeType) != "undefined" ) {
-//      trans.overrideMimeType( this.overrideMimeType );
-//  }
-    if ( callback ) return trans;
-    if ( trans && trans.responseXML && trans.responseXML.documentElement ) {
-        return this.parseDOM( trans.responseXML.documentElement );
-    } else if ( trans && trans.responseText ) {
-        return this.parseXML( trans.responseText );
-    }
-}
-
 //  method: parseDOM( documentroot )
 
-XML.ObjTree.prototype.parseDOM = function ( root ) {
+ObjTree.prototype.parseDOM = function ( root ) {
     if ( ! root ) return;
 
     this.__force_array = {};
@@ -136,7 +83,7 @@ XML.ObjTree.prototype.parseDOM = function ( root ) {
 
 //  method: parseElement( element )
 
-XML.ObjTree.prototype.parseElement = function ( elem ) {
+ObjTree.prototype.parseElement = function ( elem ) {
     //  COMMENT_NODE
     if ( elem.nodeType == 7 ) {
         return;
@@ -199,7 +146,7 @@ XML.ObjTree.prototype.parseElement = function ( elem ) {
 
 //  method: addNode( hash, key, count, value )
 
-XML.ObjTree.prototype.addNode = function ( hash, key, cnts, val ) {
+ObjTree.prototype.addNode = function ( hash, key, cnts, val ) {
     if ( this.__force_array[key] ) {
         if ( cnts == 1 ) hash[key] = [];
         hash[key][hash[key].length] = val;      // push
@@ -214,14 +161,19 @@ XML.ObjTree.prototype.addNode = function ( hash, key, cnts, val ) {
 
 //  method: writeXML( tree )
 
-XML.ObjTree.prototype.writeXML = function ( tree ) {
+ObjTree.prototype.writeXML = function ( tree ) {
     var xml = this.hash_to_xml( null, tree );
     return this.xmlDecl + xml;
 };
 
+ObjTree.prototype.writeRSS = function ( tree ) {
+    var xml = this.hash_to_xml( null, tree );
+    return this.xmlDecl+ this.rssDecl + xml + '</rss>';
+};
+
 //  method: hash_to_xml( tagName, tree )
 
-XML.ObjTree.prototype.hash_to_xml = function ( name, tree ) {
+ObjTree.prototype.hash_to_xml = function ( name, tree ) {
     var elem = [];
     var attr = [];
     for( var key in tree ) {
@@ -259,7 +211,7 @@ XML.ObjTree.prototype.hash_to_xml = function ( name, tree ) {
 
 //  method: array_to_xml( tagName, array )
 
-XML.ObjTree.prototype.array_to_xml = function ( name, array ) {
+ObjTree.prototype.array_to_xml = function ( name, array ) {
     var out = [];
     for( var i=0; i<array.length; i++ ) {
         var val = array[i];
@@ -278,7 +230,7 @@ XML.ObjTree.prototype.array_to_xml = function ( name, array ) {
 
 //  method: scalar_to_xml( tagName, text )
 
-XML.ObjTree.prototype.scalar_to_xml = function ( name, text ) {
+ObjTree.prototype.scalar_to_xml = function ( name, text ) {
     if ( name == "#text" ) {
         return this.xml_escape(text);
     } else {
@@ -288,7 +240,7 @@ XML.ObjTree.prototype.scalar_to_xml = function ( name, text ) {
 
 //  method: xml_escape( text )
 
-XML.ObjTree.prototype.xml_escape = function ( text ) {
+ObjTree.prototype.xml_escape = function ( text ) {
     return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 };
 
@@ -545,4 +497,4 @@ which I will do instead of keeping this documentation like it is.
 // ========================================================================
 */
 
-module.exports = new XML.ObjTree();
+module.exports = new ObjTree();

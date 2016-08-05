@@ -1,6 +1,6 @@
 {
   "name": "rss-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A series of useful APIs for xml(specially for RSS) and json",
   "main": "index.js",
   "scripts": {
