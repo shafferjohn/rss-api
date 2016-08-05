@@ -1,0 +1,35 @@
+{
+  "name": "rss-api",
+  "version": "1.0.2",
+  "description": "A series of useful APIs for xml(specially for RSS) and json",
+  "main": "index.js",
+  "scripts": {
+    "test": "rss"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shafferjohn/rss-api.git"
+  },
+  "keywords": [
+    "rss",
+    "api",
+    "rss-api",
+    "xml",
+    "read",
+    "feed"
+  ],
+  "author": {
+    "name": "Shaffer John",
+    "email": "823114339@qq.com",
+    "url": "http://www.shaffer.cn"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shafferjohn/rss-api/issues",
+    "email": "823114339@qq.com"
+  },
+  "homepage": "https://github.com/shafferjohn/rss-api#readme",
+  "dependencies": {
+    "xmldom": ">=0.1.22"
+  }
+}
